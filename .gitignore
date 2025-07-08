@@ -1,1 +1,5 @@
+# Virtual environment
 venv/
+
+# Cache video
+video_cache/*.mp4
