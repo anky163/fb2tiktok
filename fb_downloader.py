@@ -1,90 +1,108 @@
-# fb_downloader.py – dùng yt-dlp để tải video từ post Facebook
-import os
-import sys
-import subprocess
 import json
+import subprocess
+import os
 from datetime import datetime
 
+# Thư mục chứa video tải về
 VIDEO_DIR = "video_cache"
+
+# File cookie Facebook dạng JSON (Playwright export)
+COOKIE_JSON = "fb_cookies.json"
+
+# File tạm để lưu cookie theo định dạng Netscape
+TEMP_COOKIE_TXT = "cookies_tmp.txt"
+
+# File log lịch sử thành công và lỗi
 LOG_FILE = "logs/history.log"
-ERROR_FILE = "logs/error.log"
-COOKIE_FILE = "cookies.txt"
+ERROR_LOG = "logs/error.log"
 
-# === Ghi log ===
-def log(msg, error=False):
-    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    line = f"[{timestamp}] {msg}\n"
-    with open(ERROR_FILE if error else LOG_FILE, "a") as f:
-        f.write(line)
-    print(line, end="")
+def log(msg):
+    """Ghi log bình thường ra file history và console"""
+    time_str = datetime.now().strftime("[%Y-%m-%d %H:%M:%S]")
+    with open(LOG_FILE, "a") as f:
+        f.write(f"{time_str} {msg}\n")
+    print(msg)
 
-# === Làm sạch title để dùng làm tên file ===
-def sanitize(text):
-    return text.replace("/", "_").replace("\\", "_").strip()[:100]
+def log_error(msg):
+    """Ghi log lỗi ra file error và console"""
+    time_str = datetime.now().strftime("[%Y-%m-%d %H:%M:%S]")
+    with open(ERROR_LOG, "a") as f:
+        f.write(f"{time_str} {msg}\n")
+    print("❌", msg)
 
-# === Tải video bằng yt-dlp ===
-def download_facebook_video(url):
-    try:
-        os.makedirs(VIDEO_DIR, exist_ok=True)
+def json_to_netscape(json_path, txt_path):
+    """
+    Chuyển file cookie JSON (Playwright) sang định dạng Netscape dùng cho yt-dlp
+    """
+    with open(json_path, "r") as f:
+        cookies = json.load(f)
 
-        # === Đọc cookie từ cookies.txt ===
-        if not os.path.exists(COOKIE_FILE):
-            raise Exception("Không tìm thấy file cookies.txt")
+    lines = ["# Netscape HTTP Cookie File"]
+    for c in cookies:
+        domain = c.get("domain", ".facebook.com")
+        flag = "TRUE" if domain.startswith(".") else "FALSE"
+        path = c.get("path", "/")
+        secure = "TRUE" if c.get("secure", False) else "FALSE"
+        expiry = str(c.get("expires", 9999999999))
+        name = c["name"]
+        value = c["value"]
+        lines.append(f"{domain}\t{flag}\t{path}\t{secure}\t{expiry}\t{name}\t{value}")
 
-        cookie_str = open(COOKIE_FILE).read().strip()
-        if "=" not in cookie_str:
-            raise Exception("cookies.txt không đúng định dạng (không chứa =)")
+    with open(txt_path, "w") as f:
+        f.write("\n".join(lines) + "\n")
 
-        # === Tạo file cookies_tmp.txt theo chuẩn Netscape cho yt-dlp ===
-        temp_cookie_path = "cookies_tmp.txt"
-        with open(temp_cookie_path, "w") as f:
-            f.write("# Netscape HTTP Cookie File\n")
-            for part in cookie_str.split(";"):
-                if "=" in part:
-                    k, v = part.strip().split("=", 1)
-                    f.write(f".facebook.com\tTRUE\t/\tTRUE\t0\t{k}\t{v}\n")
+def download_video(video_url):
+    """
+    Tải video Facebook từ URL bằng yt-dlp, sử dụng cookie hợp lệ.
+    Kiểm tra tồn tại file, log chi tiết.
+    """
+    # Chuẩn bị tên file video theo phần cuối URL, thay ký tự đặc biệt thành "_"
+    video_id = "".join(c if c.isalnum() else "_" for c in video_url.split("/")[-1])[:40]
+    output_path = os.path.join(VIDEO_DIR, f"{video_id}.mp4")
 
-        # === Lấy metadata video ===
-        info = subprocess.run([
-            "yt-dlp",
-            "--cookies", temp_cookie_path,
-            "--dump-json",
-            url
-        ], capture_output=True, text=True, timeout=30)
+    # Tạo thư mục lưu video nếu chưa có
+    os.makedirs(VIDEO_DIR, exist_ok=True)
 
-        if info.returncode != 0:
-            raise Exception(f"Không lấy được metadata: {info.stderr.strip()}")
+    # Nếu file đã tồn tại, bỏ qua tải
+    if os.path.exists(output_path):
+        log(f"⚠️ Video đã tồn tại: {output_path}")
+        return
 
-        data = json.loads(info.stdout)
-        raw_title = data.get("description") or data.get("title") or "video"
-        title = sanitize(raw_title)
-        filename_tpl = f"{VIDEO_DIR}/{title}.%(ext)s"
+    # Chuyển cookie JSON sang file Netscape để yt-dlp đọc được
+    json_to_netscape(COOKIE_JSON, TEMP_COOKIE_TXT)
 
-        # === Tải video ===
-        log(f"[downloading...] {url}")
-        result = subprocess.run([
-            "yt-dlp",
-            "--cookies", temp_cookie_path,
-            "--merge-output-format", "mp4",
-            "-o", filename_tpl,
-            url
-        ], capture_output=True, text=True, timeout=120)
+    # Lệnh yt-dlp với cookie, format tốt nhất, output file chỉ định
+    cmd = [
+        "yt-dlp",
+        "--cookies", TEMP_COOKIE_TXT,
+        "-f", "best",
+        "-o", output_path,
+        video_url
+    ]
 
-        if result.returncode == 0:
-            log(f"[DOWNLOADER] OK – {title}")
-        else:
-            log(f"[DOWNLOADER] FAIL – {url}\n{result.stderr}", error=True)
+    # Chạy lệnh, lấy stdout, stderr
+    result = subprocess.run(cmd, capture_output=True, text=True)
 
-        os.remove(temp_cookie_path)
+    # Debug thông tin kết quả chạy
+    print(f"[DEBUG] yt-dlp exit code: {result.returncode}")
+    print(f"[DEBUG] File tồn tại sau tải? {os.path.exists(output_path)}")
+    print(f"[DEBUG] Đường dẫn file: {output_path}")
 
-    except Exception as e:
-        log(f"[DOWNLOADER] ERROR – {url}: {e}", error=True)
+    # Kiểm tra kết quả và file
+    if result.returncode == 0 and os.path.exists(output_path):
+        log(f"✅ Tải thành công: {video_url} -> {output_path}")
+    else:
+        log_error(f"Lỗi khi tải {video_url}")
+        log_error(f"stderr: {result.stderr.strip()}")
+        if "403" in result.stderr or "login" in result.stderr.lower():
+            log_error("→ Có thể cookie Facebook đã hết hạn.")
 
-# === Main ===
+# Nếu chạy file này trực tiếp, test tải video
 if __name__ == "__main__":
+    import sys
     if len(sys.argv) < 2:
-        print("Usage: python fb_downloader.py <facebook_video_url>")
+        print("Usage: python fb_downloader.py <video_url>")
         sys.exit(1)
 
     url = sys.argv[1]
-    download_facebook_video(url)
+    download_video(url)
