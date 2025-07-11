@@ -24,12 +24,10 @@
 ✅ Đã xử lý xong toàn bộ URL
 🟢 Giữ trình duyệt mở. CTRL+C để thoát.
 
-6. Đăng nhập facebook cho trình tải video (cho chắc, nếu nó duyệt đăng nhập rồi thì thôi)
--  python3 login_facebook.py
 
-5. Dán đường link fanpage muốn theo dõi vào pages.txt, ví dụ: https://www.facebook.com/nguyen.uc.an.ky/
+6. Dán đường link fanpage muốn theo dõi vào pages.txt, ví dụ: https://www.facebook.com/nguyen.uc.an.ky/
 
-6. Chạy watcher để theo dõi và tải các videos mới nhất
+7. Chạy watcher để theo dõi và tải các videos mới nhất
 -  python3 -m facebook_video_downloader.watcher-3-stealth
 
 ### Video tải về được lưu ở thư mục video_cache, thông tin nằm ở logs/downloaded.json
