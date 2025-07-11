@@ -1,45 +1,21 @@
-aiohappyeyeballs==2.6.1
-aiohttp==3.12.13
-aiosignal==1.4.0
-appdirs==1.4.4
-attrs==25.3.0
-beautifulsoup4==4.13.4
-bs4==0.0.2
-certifi==2025.6.15
-charset-normalizer==3.4.2
-cssselect==1.3.0
-dateparser==1.2.2
-demjson3==3.0.6
-facebook-scraper==0.2.59
-fake-useragent==2.2.0
-frozenlist==1.7.0
-greenlet==3.2.3
-idna==3.10
-importlib_metadata==8.7.0
-lxml==6.0.0
-lxml_html_clean==0.4.2
-multidict==6.6.3
-parse==1.20.2
+# Web automation
 playwright==1.53.0
 playwright-stealth==2.0.0
-propcache==0.3.2
+
+# Facebook scraping
+facebook-scraper==0.2.59
+fake-useragent==2.2.0
 psutil==7.0.0
-pyee==13.0.0
-pyppeteer==2.0.0
-pyquery==2.0.1
-python-dateutil==2.9.0.post0
-pytz==2025.2
-regex==2024.11.6
-requests==2.32.4
-requests-html==0.10.0
-six==1.17.0
-soupsieve==2.7
+
+# TikTok uploader bot
 tqdm==4.67.1
-typing_extensions==4.14.1
-tzlocal==5.3.1
-urllib3==1.26.20
-w3lib==2.3.1
-websockets==10.4
-yarl==1.20.1
+requests==2.32.4
 yt-dlp==2025.6.30
-zipp==3.23.0
+
+# Parsing & utility
+lxml==6.0.0
+beautifulsoup4==4.13.4
+dateparser==1.2.2
+
+# Optional (nếu còn xài)
+aiohttp==3.12.13
