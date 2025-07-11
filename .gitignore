@@ -1,36 +1,36 @@
-# Virtualenv
+# =========================
+# 📦 fb2tiktok Git Ignore
+# =========================
+
+# ▶️ Virtual Environment
 venv/
 
-# Logs, cache
+# 🧹 Logs & Cache
 logs/
 *.log
 *.tmp
 *.temp
 *.bak
-__pycache__/
 *.py[cod]
+*.pyo
+__pycache__/
 
-# Cookies, session, user data
+# 🍪 Cookies, Session, User Data
 cookies/*
+cookie_tmp.txt
+cookies_tmp.txt
 tiktok_user_data/
 chrome_profiles/
 
-# cookie_tmp file
-cookie_tmp.txt
-cookies_tmp.txt
-
-# Video files
+# 🎞 Video Files
 video_cache/
 *.mp4
 *.webm
 *.mov
 
-# Node modules
+# 📦 Node Modules
 node_modules/
 
-# IDE
+# 🛠 IDE & Editor Settings
 .vscode/
 .idea/
-
-# Bytecode
-*.pyo
