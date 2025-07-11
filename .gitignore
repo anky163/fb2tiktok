@@ -5,10 +5,7 @@
 # ▶️ Virtual Environment
 venv/
 
-# 🧹 Logs & Cache
-logs/*
-!logs/.gitkeep
-*.log
+# 🧹 Cache
 *.tmp
 *.temp
 *.bak
