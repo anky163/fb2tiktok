@@ -1,0 +1,11 @@
+[2025-07-10 23:49:02] Lỗi khi ghi downloaded.json: Expecting value: line 1 column 1 (char 0)
+[2025-07-11 00:09:24] Lỗi khi tải https://www.facebook.com/tran.thanh.ne/videos/1929467827821716
+[2025-07-11 00:09:24] stderr: WARNING: "-f best" selects the best pre-merged format which is often not the best option.
+         To let yt-dlp download and merge the best available formats, simply do not pass any format selection.
+         If you know what you are doing and want only the best pre-merged format, use "-f b" instead to suppress this warning
+[2025-07-11 00:11:00] Lỗi khi tải https://www.facebook.com/tran.thanh.ne/videos/1929467827821716
+[2025-07-11 00:11:00] stderr: 
+[2025-07-11 00:56:40] Lỗi khi tải https://www.facebook.com/tran.thanh.ne/videos/13765815269094474
+[2025-07-11 00:56:40] stderr: WARNING: skipping cookie file entry due to invalid expires at -1: '.facebook.com\tTRUE\t/\tTRUE\t-1\tpresence\tC%7B%22t3%22%3A%5B%5D%2C%22utc3%22%3A1752169442065%2C%22v%22%3A1%7D\n'
+ERROR: [facebook] 13765815269094474: Cannot parse data; please report this issue on  https://github.com/yt-dlp/yt-dlp/issues?q= , filling out the appropriate issue template. Confirm you are on the latest version using  yt-dlp -U
+[2025-07-11 01:13:31] ❌ Không lấy được metadata cho _v_1385546589313583

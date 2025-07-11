@@ -1,108 +1,104 @@
 # 📦 Dự án `fb2tiktok`
 
-**Tự động theo dõi Fanpage Facebook → tải video mới → đăng lên TikTok**
+**Tự động theo dõi fanpage Facebook → tải video mới → đăng lên TikTok bằng bot trình duyệt**
 
 ---
 
 ## ✅ Tiến độ triển khai
 
-### 🔹 **Giai đoạn 1 – Khởi tạo cấu trúc dự án**
+### 🔹 **Giai đoạn 1 – Cấu trúc & chuẩn bị**
 
-* [x] Tạo thư mục `fb2tiktok/` chứa các module chức năng.
-* [x] Tạo `pages.txt` – danh sách fanpage theo dõi.
-* [x] Tạo `video_cache/` để lưu video tải về.
-* [x] Tạo `logs/` để log hoạt động (`history.log`, `error.log`, `processed_ids.txt`).
-
----
-
-### 🔹 **Giai đoạn 2 – Cào video từ Fanpage**
-
-* [x] Viết `watcher.py`: theo dõi fanpage định kỳ, phát hiện post mới chứa video.
-* [x] Đọc cookie từ `fb_cookies.json`, parse thành dict cho `facebook_scraper`.
-* [x] Cơ chế tránh trùng lặp post bằng `logs/processed_ids.txt`.
-* [x] Test thành công với page công khai như `tiemcaphecu`.
+- [x] Tạo thư mục `fb2tiktok/` làm workspace chính.
+- [x] Tạo `pages.txt`: danh sách fanpage cần theo dõi.
+- [x] Tạo `video_cache/`: nơi lưu clip đã tải.
+- [x] Tạo `logs/`: ghi lại các hoạt động (`history.log`, `error.log`).
+- [x] Thiết lập môi trường `venv/`, cài đặt Playwright và yt-dlp.
 
 ---
 
-### 🔹 **Giai đoạn 3 – Tải video từ Facebook**
+### 🔹 **Giai đoạn 2 – Watcher: theo dõi fanpage**
 
-* [x] Viết `fb_downloader.py`: dùng `yt-dlp` để tải video theo URL.
-* [x] Tự động convert `fb_cookies.json` thành `cookies_tmp.txt` (Netscape format).
-* [x] Ghi log chi tiết tải thành công/thất bại, kiểm tra lỗi cookie.
-* [x] Tích hợp từ `watcher.py` → gọi `fb_downloader.py` khi phát hiện post mới.
+- [x] `watcher.py`: quét fanpage định kỳ, phát hiện post mới có video.
+- [x] Trích xuất URL và caption từ post.
+- [x] Tránh trùng video nhờ `logs/downloaded.json`.
+- [x] Chạy vô hạn trong vòng lặp, delay giữa các fanpage.
 
 ---
 
-### 🔹 **Giai đoạn 4 – Upload video lên TikTok**
+### 🔹 **Giai đoạn 3 – Download video từ Facebook**
 
-* [x] Viết `uploader_tiktok.py` sử dụng **Playwright async**.
-* [x] Giữ đăng nhập TikTok bằng thư mục `tiktok_user_data/`.
-* [x] Tự động mở `https://www.tiktok.com/upload`, chọn video, đăng bài.
-* [x] Có delay và kiểm tra nút `Đăng`, ghi log khi upload thành công.
+- [x] `fb_downloader.py`: tải video từ post bằng `yt-dlp`.
+- [x] Tự convert `fb_cookies.json` → `cookies_tmp.txt` (dạng Netscape cho yt-dlp).
+- [x] Ghi log tải thành công/thất bại, kiểm tra lỗi cookie.
+- [x] Gọi độc lập hoặc từ `watcher.py`.
+
+---
+
+### 🔹 **Giai đoạn 4 – Giả lập người dùng TikTok bằng bot**
+
+- [x] `fucktiktok/humanizer.py`: mở trình duyệt Chrome thật, điều khiển như người.
+- [x] Hover, paste caption, click upload → hoạt động ổn định.
+- [x] Cookie đăng nhập TikTok được lưu ở `cookies/tiktok_cookies.json`, đủ giữ session lâu dài.
+- [x] Inject script `stealth_patch-2.js` qua `stealth.py` để bypass anti-bot.
+- [x] `tiktok_uploader/uploader.py` đạt milestone "debug sâu & phản xạ thật": thao tác y như người dùng thực, kiểm tra lỗi upload kỹ lưỡng, chỉ ghi log nếu upload thành công.
 
 ---
 
 ### 🔹 **Giai đoạn 5 – Quản lý cookie Facebook**
 
-* [x] Module `fb_cookies_manager/` chia làm các file:
-
-  * `login.py`: tự động login Facebook lưu `fb_cookies.json`
-  * `auto.py`, `checker.py`, `utils.py`: dự kiến dùng cho việc kiểm tra/gia hạn
-* [x] Có thể chạy `python -m fb_cookies_manager` hoặc `fb_cookie_manager_cli.py`
-* [x] Hỗ trợ lấy lại cookie bằng tay 1 lần, sau đó dùng mãi
+- [x] `login_facebook.py`: login tay, trích cookie TikTok/Facebook
+- [x] Cookie lưu vào `cookies/facebook_cookies.json`
 
 ---
 
-## 📁 Cấu trúc thư mục (thực tế)
+## 📁 Cấu trúc thực tế (tóm tắt)
 
-```
 fb2tiktok/
-├── config.json                 # Chứa fb_user, fb_pass nếu dùng login tự động
-├── fb_cookies.json             # Cookie Facebook định dạng JSON
-├── cookies_tmp.txt            # Bản tạm Netscape cho yt-dlp
-├── fb_cookies_manager/        # Module quản lý cookie FB
-│   ├── login.py               # Tự động login Facebook
-│   ├── auto.py                # (chưa dùng)
-│   ├── checker.py             # (chưa dùng)
-│   ├── utils.py               # (trống)
-│   └── __main__.py
-├── fb_cookie_manager_cli.py   # CLI chạy nhanh quản lý cookie
-├── fb_downloader.py           # Dùng yt-dlp tải video
-├── uploader_tiktok.py         # Upload video lên TikTok
-├── manual_upload.py           # Upload TikTok bằng tay nếu cần
-├── login_cookie.py            # Legacy script hỗ trợ login
-├── watcher.py                 # Theo dõi fanpage và gọi downloader
+├── chrome_profiles/  # Profile trình duyệt theo mục đích (TikTok, Facebook...)
+├── cookies/  # Tất cả cookie (TikTok, FB, Google, v.v.)
+├── facebook_video_downloader/
+│   ├── watcher-3-stealth.py
+│   ├── fb_downloader.py
+├── fucktiktok/
+│   ├── uploader.py
+│   ├── stealth.py, humanizer.py
+├── tiktok_uploader/
+│   ├── uploader.py, uploader-1.py, utils.py
 ├── logs/
-│   ├── history.log
-│   ├── error.log
-│   └── processed_ids.txt
-├── pages.txt                  # Danh sách fanpage
-├── video_cache/               # Lưu video đã tải
-├── tiktok_user_data/          # Dữ liệu trình duyệt TikTok
-└── venv/                      # Virtual environment
-```
+├── video_cache/
+├── tiktok_user_data/
+├── login_tiktok_qr.py, login_facebook.py
+├── pages.txt, config.json
 
 ---
 
 ## 📌 Kết quả hiện tại:
 
-> 🟢 **Hệ thống chạy hoàn toàn tự động**:
-> Khi một fanpage đăng video mới → script sẽ **phát hiện**, **tải về**, và **đăng lên TikTok** mà không cần can thiệp tay.
+> ✅ **Đã có thể chạy thủ công toàn bộ pipeline:**
+> 1. `watcher.py` phát hiện post mới  
+> 2. `fb_downloader.py` tải video  
+> 3. `uploader.py` mở trình duyệt thật, đăng lên TikTok  
+>     Trình trạng: upload vẫn bị lỗi
+> 4. Trình duyệt giữ mở để quan sát. Log kỹ cả toast lỗi.
+
+> ⚠️ Chưa khép kín toàn bộ pipeline thành 1 script tự động từ A→Z  
+
 
 ---
 
-## 🚧 TODO tiếp theo:
+## 🛠 TODO tiếp theo:
 
-* [ ] Kiểm tra session TikTok còn hoạt động không trước khi upload.
-* [ ] Gửi email/Telegram nếu upload lỗi.
-* [ ] Cấu hình caption tự sinh từ bài viết Facebook.
-* [ ] Lọc theo tag, caption, hoặc điều kiện tùy biến.
-* [ ] Hỗ trợ chạy như systemd service hoặc Docker container.
+- [ ] Ghép watcher → downloader → uploader thành 1 flow duy nhất (`auto_uploader.py`)
+- [ ] Fake tương tác chuột/phím nâng cao trong `humanizer.py`
+- [ ] Retry khi upload thất bại, thêm alert/log riêng
+- [ ] Cho phép caption tự sinh từ post Facebook hoặc filter video theo từ khóa
+- [ ] Docker hóa hoặc tạo systemd service để chạy nền
 
 ---
 
-## ✍ Ghi chú
+## 🧠 Ghi chú kỹ thuật
 
-* Cookie Facebook cần lấy từ tài khoản đã login, dạng JSON (`fb_cookies.json`).
-* TikTok chỉ cần login 1 lần bằng Playwright (đã lưu session).
-* Phát hiện video dùng `facebook_scraper`, không gọi API chính thức.
+- Không dùng API TikTok/Facebook → tránh toang do auth
+- Cookie TikTok có thể giữ đăng nhập lâu dài nếu không bị xoá session thủ công
+- Chỉ cần login QR 1 lần, lưu `tiktok_cookies.json` là đủ
+- Upload TikTok bằng **bot trình duyệt thật** → bám UI layout, dễ toang nếu TikTok đổi giao diện

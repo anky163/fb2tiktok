@@ -1,3 +1,2 @@
-2025/07/08-04:00:30.100 1007 Reusing MANIFEST /home/k/fb2tiktok/tiktok_user_data/Default/Local Storage/leveldb/MANIFEST-000001
-2025/07/08-04:00:30.107 1007 Recovering log #4
-2025/07/08-04:00:30.109 1007 Reusing old log /home/k/fb2tiktok/tiktok_user_data/Default/Local Storage/leveldb/000004.log 
+2025/07/10-13:32:20.987 32ad Creating DB /home/k/fb2tiktok/tiktok_user_data/Default/Local Storage/leveldb since it was missing.
+2025/07/10-13:32:21.005 32ad Reusing MANIFEST /home/k/fb2tiktok/tiktok_user_data/Default/Local Storage/leveldb/MANIFEST-000001
