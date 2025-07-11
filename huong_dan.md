@@ -1,4 +1,4 @@
-# Đầu tiên, tạo folder cookies: mkdir cookies
+0. Đầu tiên, tạo folder cookies: mkdir cookies
 
 1. Tạo môi trường ảo để cài các thư viện cần thiết
 -  python3 -m venv venv
