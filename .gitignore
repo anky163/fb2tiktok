@@ -15,7 +15,6 @@ __pycache__/
 
 # 🍪 Cookies, Session, User Data
 cookies/*
-!cookies/.gitkeep
 cookie_tmp.txt
 cookies_tmp.txt
 tiktok_user_data/
