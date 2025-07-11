@@ -6,7 +6,8 @@
 venv/
 
 # 🧹 Logs & Cache
-logs/
+logs/*
+!logs/.gitkeep
 *.log
 *.tmp
 *.temp
@@ -17,13 +18,15 @@ __pycache__/
 
 # 🍪 Cookies, Session, User Data
 cookies/*
+!cookies/.gitkeep
 cookie_tmp.txt
 cookies_tmp.txt
 tiktok_user_data/
 chrome_profiles/
 
 # 🎞 Video Files
-video_cache/
+video_cache/*
+!video_cache/.gitkeep
 *.mp4
 *.webm
 *.mov
